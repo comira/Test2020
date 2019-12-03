@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>2020年会发生的几件事</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
+</head>
+<body>
+<img src="" id="img_res" style="width: 100%" alt="">
+<canvas id="res" width="408" height="627" style="width: 100%;display: none"></canvas>
+<script>
+    (function () {
+        let images = {
+            background: 'background.png',
+            avatar: 'avatar.jpg',
+        };
+        let canvas = document.getElementById('res');
+        let img = document.getElementById('img_res');
+        let ctx = canvas.getContext('2d');
+        ctx.font = "30px sans-serif";
+
+        function loadImages(images, callback) {
+            let count = 0, res = {}, num = 0;
+            for (let i in images) {
+                num++;
+            }
+            for (let i in images) {
+                if (images.hasOwnProperty(i)) {
+                    res[i] = new Image();
+                    res[i].onload = function () {
+                        if (++count >= num) {
+                            callback(res);
+                        }
+                    };
+                    res[i].src = images[i];
+                }
+            }
+        }
+
+        ctx.fillText('加载中,请稍后...',90,200);
+        loadImages(images, function (res) {
+            ctx.drawImage(res.background, 0, 0);
+            ctx.drawImage(res.avatar, 90, 90, 75, 75);
+            fetch('data.json').then(r => r.json()).then(r => {
+                let index = Math.floor(Math.random() * Math.floor(r.length));
+                let res = r[index];
+                res.forEach((v, i) => {
+                    ctx.fillText(`${i + 1}.${v}`, 90, 230 + 55 * i);
+                });
+                img.src = canvas.toDataURL('image/png')
+            });
+        })
+    })();
+</script>
+</body>
+</html>
